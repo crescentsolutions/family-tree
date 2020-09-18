@@ -57,17 +57,20 @@ router.get('/family-members/:id', requireToken, (req, res, next) => {
 
 // CREATE
 // POST /family-members
-router.post('/family-members', (req, res) => {
+router.post('/family-members', requireToken, (req, res, next) => {
   console.log('add a family member')
   console.log('req.body is', req.body)
   console.log('req.body is', req.body.familyMember)
 
+  req.body.familyMember.owner = req.user.id
   const familyData = req.body.familyMember
 
   FamilyMember.create(familyData)
-    // Be sure to inlcude .toObject() in the .json method
-    .then(familyMember => res.status(201).json({ familyMember: familyMember.toObject() }))
-    .catch(console.error)
+  // respond to succesful `create` with status 201 and JSON of new "familyMember"
+    .then(familyMember => {
+      res.status(201).json({ familyMember: familyMember.toObject() })
+    })
+    .catch(next)
 })
 // router.post('/family-members', requireToken, (req, res, next) => {
 //   // set owner of new familyMember to be current user
