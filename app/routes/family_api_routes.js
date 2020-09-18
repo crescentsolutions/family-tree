@@ -3,7 +3,7 @@ const express = require('express')
 // Passport docs: http://www.passportjs.org/docs/
 const passport = require('passport')
 
-// pull in Mongoose model for examples
+// pull in Mongoose model for family-members
 const FamilyMember = require('../models/family_api')
 
 // this is a collection of methods that help us detect situations when we need
@@ -17,7 +17,7 @@ const handle404 = customErrors.handle404
 const requireOwnership = customErrors.requireOwnership
 
 // this is middleware that will remove blank fields from `req.body`, e.g.
-// { example: { title: '', text: 'foo' } } -> { example: { text: 'foo' } }
+// { familyMember: { title: '', text: 'foo' } } -> { familyMember: { text: 'foo' } }
 const removeBlanks = require('../../lib/remove_blank_fields')
 // passing this as a second argument to `router.<verb>` will make it
 // so that a token MUST be passed for that route to be available
@@ -28,66 +28,78 @@ const requireToken = passport.authenticate('bearer', { session: false })
 const router = express.Router()
 
 // INDEX
-// GET /examples
-router.get('/examples', requireToken, (req, res, next) => {
+// GET /family-members
+router.get('/family-members', requireToken, (req, res, next) => {
   FamilyMember.find()
-    .then(examples => {
-      // `examples` will be an array of Mongoose documents
+    .then(familyMembers => {
+      // `family-members` will be an array of Mongoose documents
       // we want to convert each one to a POJO, so we use `.map` to
       // apply `.toObject` to each one
-      return examples.map(example => example.toObject())
+      return familyMembers.map(singleMember => singleMember.toObject())
     })
-    // respond with status 200 and JSON of the examples
-    .then(examples => res.status(200).json({ examples: examples }))
+    // respond with status 200 and JSON of the family-members
+    .then(familyMembers => res.status(200).json({ familyMembers: familyMembers }))
     // if an error occurs, pass it to the handler
     .catch(next)
 })
 
 // SHOW
-// GET /examples/5a7db6c74d55bc51bdf39793
-router.get('/examples/:id', requireToken, (req, res, next) => {
+// GET /family-members/5a7db6c74d55bc51bdf39793
+router.get('/family-members/:id', requireToken, (req, res, next) => {
   // req.params.id will be set based on the `:id` in the route
   FamilyMember.findById(req.params.id)
     .then(handle404)
-    // if `findById` is succesful, respond with 200 and "example" JSON
-    .then(example => res.status(200).json({ example: example.toObject() }))
+    // if `findById` is succesful, respond with 200 and "familyMember" JSON
+    .then(familyMember => res.status(200).json({ familyMember: familyMember.toObject() }))
     // if an error occurs, pass it to the handler
     .catch(next)
 })
 
 // CREATE
-// POST /examples
-router.post('/examples', requireToken, (req, res, next) => {
-  // set owner of new example to be current user
-  req.body.example.owner = req.user.id
+// POST /family-members
+router.post('/family-members', (req, res) => {
+  console.log('add a family member')
+  console.log('req.body is', req.body)
+  console.log('req.body is', req.body.familyMember)
 
-  FamilyMember.create(req.body.example)
-    // respond to succesful `create` with status 201 and JSON of new "example"
-    .then(example => {
-      res.status(201).json({ example: example.toObject() })
-    })
-    // if an error occurs, pass it off to our error handler
-    // the error handler needs the error message and the `res` object so that it
-    // can send an error message back to the client
-    .catch(next)
+  const familyData = req.body.familyMember
+
+  FamilyMember.create(familyData)
+    // Be sure to inlcude .toObject() in the .json method
+    .then(familyMember => res.status(201).json({ familyMember: familyMember.toObject() }))
+    .catch(console.error)
 })
+// router.post('/family-members', requireToken, (req, res, next) => {
+//   // set owner of new familyMember to be current user
+//   req.body.familyMember.owner = req.user.id
+//
+//   FamilyMember.create(req.body.familyMember)
+//     // respond to succesful `create` with status 201 and JSON of new "familyMember"
+//     .then(familyMember => {
+//       res.status(201).json({ familyMember: familyMember.toObject() })
+//     })
+//     // if an error occurs, pass it off to our error handler
+//     // the error handler needs the error message and the `res` object so that it
+//     // can send an error message back to the client
+//     .catch(next)
+// })
 
 // UPDATE
-// PATCH /examples/5a7db6c74d55bc51bdf39793
-router.patch('/examples/:id', requireToken, removeBlanks, (req, res, next) => {
+// PATCH /family-members/5a7db6c74d55bc51bdf39793
+router.patch('/family-members/:id', requireToken, removeBlanks, (req, res, next) => {
   // if the client attempts to change the `owner` property by including a new
   // owner, prevent that by deleting that key/value pair
-  delete req.body.example.owner
+  delete req.body.familyMember.owner
 
   FamilyMember.findById(req.params.id)
     .then(handle404)
-    .then(example => {
+    .then(familyMember => {
       // pass the `req` object and the Mongoose record to `requireOwnership`
       // it will throw an error if the current user isn't the owner
-      requireOwnership(req, example)
+      requireOwnership(req, familyMember)
 
       // pass the result of Mongoose's `.update` to the next `.then`
-      return example.updateOne(req.body.example)
+      return familyMember.updateOne(req.body.familyMember)
     })
     // if that succeeded, return 204 and no JSON
     .then(() => res.sendStatus(204))
@@ -96,15 +108,15 @@ router.patch('/examples/:id', requireToken, removeBlanks, (req, res, next) => {
 })
 
 // DESTROY
-// DELETE /examples/5a7db6c74d55bc51bdf39793
-router.delete('/examples/:id', requireToken, (req, res, next) => {
+// DELETE /family-members/5a7db6c74d55bc51bdf39793
+router.delete('/family-members/:id', requireToken, (req, res, next) => {
   FamilyMember.findById(req.params.id)
     .then(handle404)
-    .then(example => {
-      // throw an error if current user doesn't own `example`
-      requireOwnership(req, example)
-      // delete the example ONLY IF the above didn't throw
-      example.deleteOne()
+    .then(familyMember => {
+      // throw an error if current user doesn't own `familyMember`
+      requireOwnership(req, familyMember)
+      // delete the familyMember ONLY IF the above didn't throw
+      familyMember.deleteOne()
     })
     // send back 204 and no content if the deletion succeeded
     .then(() => res.sendStatus(204))
