@@ -58,9 +58,10 @@ router.get('/family-members/:id', requireToken, (req, res, next) => {
 // CREATE
 // POST /family-members
 router.post('/family-members', requireToken, (req, res, next) => {
-  console.log('add a family member')
+  console.log('CREATE: ')
+  console.log('req.user is', req.user)
   console.log('req.body is', req.body)
-  console.log('req.body is', req.body.familyMember)
+  console.log('req.body.familyMember is', req.body.familyMember)
 
   req.body.familyMember.owner = req.user.id
   const familyData = req.body.familyMember
@@ -72,20 +73,6 @@ router.post('/family-members', requireToken, (req, res, next) => {
     })
     .catch(next)
 })
-// router.post('/family-members', requireToken, (req, res, next) => {
-//   // set owner of new familyMember to be current user
-//   req.body.familyMember.owner = req.user.id
-//
-//   FamilyMember.create(req.body.familyMember)
-//     // respond to succesful `create` with status 201 and JSON of new "familyMember"
-//     .then(familyMember => {
-//       res.status(201).json({ familyMember: familyMember.toObject() })
-//     })
-//     // if an error occurs, pass it off to our error handler
-//     // the error handler needs the error message and the `res` object so that it
-//     // can send an error message back to the client
-//     .catch(next)
-// })
 
 // UPDATE
 // PATCH /family-members/5a7db6c74d55bc51bdf39793
@@ -93,16 +80,19 @@ router.patch('/family-members/:id', requireToken, removeBlanks, (req, res, next)
   // if the client attempts to change the `owner` property by including a new
   // owner, prevent that by deleting that key/value pair
   delete req.body.familyMember.owner
+  const id = req.params.id
+  const familyData = req.body.familyMember
 
-  FamilyMember.findById(req.params.id)
+  FamilyMember.findById(id)
     .then(handle404)
-    .then(familyMember => {
-      // pass the `req` object and the Mongoose record to `requireOwnership`
-      // it will throw an error if the current user isn't the owner
-      requireOwnership(req, familyMember)
+    .then(familyData => {
+      requireOwnership(req, familyData)
 
       // pass the result of Mongoose's `.update` to the next `.then`
-      return familyMember.updateOne(req.body.familyMember)
+      return familyData
+    })
+    .then(familyMember => {
+      familyMember.updateOne(familyData)
     })
     // if that succeeded, return 204 and no JSON
     .then(() => res.sendStatus(204))
