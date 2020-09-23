@@ -1,6 +1,6 @@
 ![Crescent Media Logo](https://www.crescentdigitalmedia.solutions/wp-content/uploads/2020/05/logo-v3.png)
 
-# Application Title: Family Tree
+# Application Title: Family Tree API
 
 ## Wireframe:
 ![Project 2 - Full Stack](https://media.git.generalassemb.ly/user/30423/files/a221c280-f8d7-11ea-825c-39ed4926c828)
