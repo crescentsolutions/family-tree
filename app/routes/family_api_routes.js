@@ -58,11 +58,6 @@ router.get('/family-members/:id', requireToken, (req, res, next) => {
 // CREATE
 // POST /family-members
 router.post('/family-members', requireToken, (req, res, next) => {
-  console.log('CREATE: ')
-  console.log('req.user is', req.user)
-  console.log('req.body is', req.body)
-  console.log('req.body.familyMember is', req.body.familyMember)
-
   req.body.familyMember.owner = req.user.id
   const familyData = req.body.familyMember
 
