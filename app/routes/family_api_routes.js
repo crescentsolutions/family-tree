@@ -103,12 +103,10 @@ router.patch('/family-members/:id', requireToken, removeBlanks, (req, res, next)
 // DESTROY
 // DELETE /family-members/5a7db6c74d55bc51bdf39793
 router.delete('/family-members/:id', requireToken, (req, res, next) => {
-  FamilyMember.findById(req.params.id)
+  const id = req.params.id
+  FamilyMember.findById(id)
     .then(handle404)
     .then(familyMember => {
-      // throw an error if current user doesn't own `familyMember`
-      requireOwnership(req, familyMember)
-      // delete the familyMember ONLY IF the above didn't throw
       familyMember.deleteOne()
     })
     // send back 204 and no content if the deletion succeeded
