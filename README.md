@@ -15,6 +15,9 @@ Live Site: https://crescentsolutions.github.io/family-tree-client/
 ## Wireframe:
 ![Project 2 - Full Stack](https://media.git.generalassemb.ly/user/30423/files/a221c280-f8d7-11ea-825c-39ed4926c828)
 
+## ERD
+![Entity Relationship Diagram](https://ibb.co/t4nphz8)
+
 ## User Stories:
 
 - As a User I want a form so that I can sign up [POST]
