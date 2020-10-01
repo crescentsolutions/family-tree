@@ -27,7 +27,7 @@ Live Site: https://crescentsolutions.github.io/family-tree-client/
 - As a User I want a process to edit my generation [PATCH]
 - As a User I want a button to delete a generation [DELETE]
 
-## Process for Building Desktop Application
+## Process for Building Express API
 1. Create auth folder to contain .sh files for curl scripts /curl-scripts/auth
 2. Create .sh files for each curl script I need to test
       - ex: /curl-scripts/auth/sign-in.sh,
@@ -39,6 +39,8 @@ Live Site: https://crescentsolutions.github.io/family-tree-client/
 4. Create routes for family members based on data models and curl scripts
 5. Test routes
 6. Initialize the process that does error handling.
+
+In the future I would like to fix some of my error handling and make the message more specific to the situation.
 
 ## Technologies Used
 - Express
