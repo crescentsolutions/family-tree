@@ -16,7 +16,7 @@ Live Site: https://crescentsolutions.github.io/family-tree-client/
 ![Project 2 - Full Stack](https://media.git.generalassemb.ly/user/30423/files/a221c280-f8d7-11ea-825c-39ed4926c828)
 
 ## ERD
-![Entity Relationship Diagram](https://ibb.co/t4nphz8)
+<a href="https://ibb.co/t4nphz8"><img src="https://i.ibb.co/6mG0Z8g/20201001-164639.jpg" alt="20201001-164639" border="0"></a><br /><a target='_blank' href='https://imgbb.com/'>pic share</a><br />
 
 ## User Stories:
 
